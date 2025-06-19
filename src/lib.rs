@@ -83,6 +83,8 @@
 pub(crate) mod error;
 mod parser;
 
+use std::collections::BTreeMap;
+
 #[cfg(feature = "uri")]
 use http::Uri;
 use http::{HeaderMap, Method};
@@ -99,4 +101,5 @@ pub struct ParsedRequest {
     pub headers: HeaderMap,
     pub body: Vec<String>,
     pub insecure: bool,
+    pub data_url_encoded: BTreeMap<String, String>,
 }

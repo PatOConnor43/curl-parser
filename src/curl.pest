@@ -13,7 +13,7 @@ double_quoted_inner = { (!"\"" ~ ANY)* }
 none_ws = { (!ws ~ ANY)+ }
 url_plain = @{ "http" ~ "s"? ~ "://" ~ none_ws }
 url = { single_quoted | double_quoted | url_plain }
-option = _{ method_option | header_option | location_option | body_option | auth_option | ssl_verify_option }
+option = _{ method_option | header_option | location_option | body_option | auth_option | ssl_verify_option | data_urlencode_option }
 
 method_option = _{ ("-X" | "--request") ~ ws+ ~ method }
 method = @{ "GET" | "POST" | "PUT" | "DELETE" | "PATCH" }
@@ -27,6 +27,13 @@ location = { single_quoted | double_quoted | none_ws }
 body_option = _{ ("-d" | "--data") ~ ws+ ~ body }
 body = { single_quoted | double_quoted | (!((" -" ~ ASCII_ALPHA_UPPER) | (" --" ~ ASCII_ALPHA_LOWER) | "\\") ~ ANY)+ }
 
+data_urlencode_option = _{ ("--data-urlencode") ~ ws+ ~ data_urlencode }
+data_urlencode = { data_urlencode_single_quoted | data_urlencode_double_quoted }
+data_urlencode_single_quoted = _{ "'" ~ data_urlencode_single_quoted_inner ~ "'" }
+data_urlencode_single_quoted_inner = _{ (!"'" ~ ANY)* }
+data_urlencode_double_quoted = _{ "\"" ~ data_urlencode_double_quoted_inner ~ "\"" }
+data_urlencode_double_quoted_inner = _{ (!"\"" ~ ANY)* }
+
 auth_option = _{ "-u" ~ ws+ ~ auth }
 auth = { single_quoted | double_quoted | none_ws }
 
@@ -37,3 +44,4 @@ wss = _{ ws* ~ slash* ~ ws* }
 input = _{
     SOI ~ (comment | ws | newline)* ~ ws* ~ "curl" ~ wss ~ (option ~ wss )* ~ url? ~ (wss ~ option ~ wss)* ~ ws* ~ EOI
 }
+

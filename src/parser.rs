@@ -89,6 +89,16 @@ fn parse_input(input: &str) -> Result<ParsedRequest> {
             Rule::ssl_verify_option => {
                 parsed.insecure = true;
             }
+            Rule::data_urlencode => {
+                let s = pair.as_str().trim();
+                let s = remove_quote(s);
+                if let Some((key, value)) = s.split_once('=') {
+                    parsed.data_url_encoded.insert(
+                        remove_quote(key).to_string(),
+                        remove_quote(value).to_string(),
+                    );
+                }
+            }
             Rule::EOI => break,
             _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
         }
