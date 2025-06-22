@@ -93,6 +93,9 @@ fn parse_input(input: &str) -> Result<ParsedRequest> {
                 let s = pair.as_str().trim();
                 let s = remove_quote(s);
                 if let Some((key, value)) = s.split_once('=') {
+                    if key.is_empty() {
+                        continue;
+                    }
                     parsed.data_url_encoded.insert(
                         remove_quote(key).to_string(),
                         remove_quote(value).to_string(),
@@ -187,6 +190,9 @@ impl TryFrom<&ParsedRequest> for reqwest::RequestBuilder {
 }
 
 fn remove_quote(s: &str) -> &str {
+    if s.is_empty() {
+        return s;
+    }
     match (&s[0..1], &s[s.len() - 1..]) {
         ("'", "'") => &s[1..s.len() - 1],
         ("\"", "\"") => &s[1..s.len() - 1],
